@@ -9,20 +9,76 @@ class GameTests extends path.FunSpec with Matchers {
 
   describe("Game") {
 
-    describe("when board only has a single white pawn on a3") {
+    describe("Pawns") {
 
-      val pawn = new Piece(White, Pawn, "a3")
-      val game = new Game(pieces = List(pawn))
+      describe("when board only has a single white pawn on a3") {
 
-      it("has one available move on white's turn - pawn to a4") {
-        game.availableMoves should contain(new Move(piece = pawn, position = "a4"))
+        val whitePawn = new Piece(White, Pawn, "a3")
+
+        it("has one available move on white's turn - pawn to a4") {
+          val game = new Game(pieces = List(whitePawn), currentTurn = White)
+          game.availableMoves should contain theSameElementsAs moveList(whitePawn, List("a4"))
+        }
+
+        it("has no available moves on black's turn") {
+          val game = new Game(pieces = List(whitePawn), currentTurn = Black)
+          game.availableMoves shouldBe empty
+        }
+
       }
 
-      it("has no available moves on black's turn") {
-        game.currentTurn = Black
-        game.availableMoves shouldBe empty
+      describe("when board only has a single black pawn on a3") {
+
+        val blackPawn = new Piece(Black, Pawn, "a3")
+
+        it("has one available move on black's turn - pawn to a2") {
+          val game = new Game(pieces = List(blackPawn), currentTurn = Black)
+          game.availableMoves should contain theSameElementsAs moveList(blackPawn, List("a2"))
+        }
+
+        it("has no available moves on white's turn") {
+          val game = new Game(pieces = List(blackPawn), currentTurn = White)
+          game.availableMoves shouldBe empty
+        }
+
       }
 
+      describe("when board only has a single white pawn on a2") {
+
+        val whitePawn = new Piece(White, Pawn, "a2")
+
+        it("has two available moves on white's turn - pawn to a3 and pawn to a4") {
+          val game = new Game(pieces = List(whitePawn), currentTurn = White)
+          game.availableMoves should contain theSameElementsAs moveList(whitePawn, List("a3", "a4"))
+        }
+
+      }
+
+      describe("when board only has a single black pawn on d7") {
+
+        val blackPawn = new Piece(Black, Pawn, "d7")
+
+        it("has two available moves on black's turn - pawn to d6 and pawn to d5") {
+          val game = new Game(pieces = List(blackPawn), currentTurn = Black)
+          game.availableMoves should contain theSameElementsAs moveList(blackPawn, List("d6", "d5"))
+        }
+
+      }
+
+      describe("when board only has a single white pawn on d7") {
+
+        val whitePawn = new Piece(White, Pawn, "d7")
+
+        it("has one available move on white's turn - pawn to d8") {
+          val game = new Game(pieces = List(whitePawn), currentTurn = White)
+          game.availableMoves should contain theSameElementsAs moveList(whitePawn, List("d8"))
+        }
+
+      }
+
+      def moveList(piece: Piece, positions: List[String]): List[Move] = {
+        positions.map(position => new Move(piece = piece, position = position))
+      }
     }
 
   }
