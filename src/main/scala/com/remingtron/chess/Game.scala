@@ -1,6 +1,8 @@
 package com.remingtron.chess
 
-import com.remingtron.chess.piece.{PieceColor, Piece}
+import java.lang.Math.{abs, max}
+
+import com.remingtron.chess.piece.{Position, PieceColor, Piece}
 import com.remingtron.chess.piece.PieceColor.{Black, White}
 
 class Game(private val pieces: List[Piece], val currentTurn: PieceColor = White) {
@@ -16,7 +18,28 @@ class Game(private val pieces: List[Piece], val currentTurn: PieceColor = White)
     def pawnInStartingPosition: Boolean = {
       List((White, '2'), (Black, '7')).contains(piece.color, piece.position.rank)
     }
-    if (pawnInStartingPosition) List(moveSpaces(1), moveSpaces(2)) else List(moveSpaces(1))
+    val possibleMoves = if (pawnInStartingPosition) List(moveSpaces(1), moveSpaces(2)) else List(moveSpaces(1))
+    possibleMoves.filterNot(move => pieceExistsAlongPath(move.piece.position, move.position))
+  }
+
+  private def pieceExistsAlongPath(startingPosition: Position, endingPosition: Position): Boolean = {
+    def convertToDirection(numberOfSpaces: Int): Int = {
+      if (numberOfSpaces == 0) 0 else numberOfSpaces / abs(numberOfSpaces)
+    }
+    val numberOfFilesToMove = endingPosition.file - startingPosition.file
+    val numberOfRanksToMove = endingPosition.rank - startingPosition.rank
+    val fileDirectionToMove = convertToDirection(numberOfFilesToMove)
+    val rankDirectionToMove = convertToDirection(numberOfRanksToMove)
+    val numberOfSpacesToMove = max(abs(numberOfFilesToMove), abs(numberOfRanksToMove))
+
+    (1 to numberOfSpacesToMove).map(n =>
+      Position(rank = startingPosition.rank + rankDirectionToMove * n,
+        file = startingPosition.file + fileDirectionToMove * n))
+      .exists(position => pieceExistsAtPosition(position))
+  }
+
+  private def pieceExistsAtPosition(position: Position): Boolean = {
+    pieces.exists(piece => piece.position == position)
   }
 
   private def moveDirection = if (currentTurn == White) 1 else -1

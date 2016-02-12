@@ -11,6 +11,10 @@ class PositionTests extends path.FunSpec with Matchers {
       ("a4": Position).toString shouldEqual "a4"
     }
 
+    it("two positions with the same value should be equal") {
+      ("a5": Position) shouldEqual ("a5": Position)
+    }
+
   }
 
 }
