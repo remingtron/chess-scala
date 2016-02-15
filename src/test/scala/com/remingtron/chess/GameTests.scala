@@ -112,6 +112,24 @@ class GameTests extends path.FunSpec with Matchers {
 
       }
 
+      describe("when board has a white pawn on b8") {
+        val whitePawn = new Piece(White, Pawn, "b8")
+
+        it("has no available moves on white's turn") {
+          val game = new Game(pieces = List(whitePawn), currentTurn = White)
+          game.availableMoves shouldBe empty
+        }
+      }
+
+      describe("when board has a black pawn on b1") {
+        val blackPawn = new Piece(Black, Pawn, "b1")
+
+        it("has no available moves on black's turn") {
+          val game = new Game(pieces = List(blackPawn), currentTurn = Black)
+          game.availableMoves shouldBe empty
+        }
+      }
+
       def moveList(piece: Piece, positions: List[String]): List[Move] = {
         positions.map(position => new Move(piece = piece, position = position))
       }

@@ -19,7 +19,11 @@ class Game(private val pieces: List[Piece], val currentTurn: PieceColor = White)
       List((White, '2'), (Black, '7')).contains(piece.color, piece.position.rank)
     }
     val possibleMoves = if (pawnInStartingPosition) List(moveSpaces(1), moveSpaces(2)) else List(moveSpaces(1))
-    possibleMoves.filterNot(move => pieceExistsAlongPath(move.piece.position, move.position))
+    possibleMoves.filterNot(move => movingOffBoard(move.position) || pieceExistsAlongPath(move.piece.position, move.position))
+  }
+
+  private def movingOffBoard(position: Position): Boolean = {
+    position.rank > '8' || position.rank < '1'
   }
 
   private def pieceExistsAlongPath(startingPosition: Position, endingPosition: Position): Boolean = {
