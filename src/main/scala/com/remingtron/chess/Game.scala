@@ -12,18 +12,22 @@ class Game(private val pieces: List[Piece], val currentTurn: PieceColor = White)
   }
 
   def availableMovesForPiece(piece: Piece): List[Move] = {
-    def moveSpaces(n: Int): Move = {
-      new Move(piece, piece.position.copy(rank = piece.position.rank + moveDirection * n))
-    }
-    def pawnInStartingPosition: Boolean = {
-      List((White, '2'), (Black, '7')).contains(piece.color, piece.position.rank)
-    }
-    val possibleMoves = if (pawnInStartingPosition) List(moveSpaces(1), moveSpaces(2)) else List(moveSpaces(1))
-    possibleMoves.filterNot(move => movingOffBoard(move.position) || pieceExistsAlongPath(move.piece.position, move.position))
+    possibleNonCaptureMoves(piece) ++ possibleCaptureMoves(piece)
   }
 
   private def movingOffBoard(position: Position): Boolean = {
     position.rank > '8' || position.rank < '1'
+  }
+
+  private def possibleNonCaptureMoves(piece: Piece): List[Move] = {
+    def moveSpaces(n: Int): Move = {
+      new NonCaptureMove(piece, piece.position.copy(rank = piece.position.rank + moveDirection * n))
+    }
+    def pawnInStartingPosition: Boolean = {
+      List((White, '2'), (Black, '7')).contains(piece.color, piece.position.rank)
+    }
+    val possibleNonCaptureMoves = if (pawnInStartingPosition) List(moveSpaces(1), moveSpaces(2)) else List(moveSpaces(1))
+    possibleNonCaptureMoves.filterNot(move => movingOffBoard(move.position) || pieceExistsAlongPath(move.piece.position, move.position))
   }
 
   private def pieceExistsAlongPath(startingPosition: Position, endingPosition: Position): Boolean = {
@@ -39,13 +43,20 @@ class Game(private val pieces: List[Piece], val currentTurn: PieceColor = White)
     (1 to numberOfSpacesToMove).map(n =>
       Position(rank = startingPosition.rank + rankDirectionToMove * n,
         file = startingPosition.file + fileDirectionToMove * n))
-      .exists(position => pieceExistsAtPosition(position))
+      .exists(position => pieceExistsAtPosition(position, None))
   }
 
-  private def pieceExistsAtPosition(position: Position): Boolean = {
-    pieces.exists(piece => piece.position == position)
+  private def pieceExistsAtPosition(position: Position, color: Option[PieceColor]): Boolean = {
+    pieces.exists(piece => piece.position == position && (color.isEmpty || color.get == piece.color))
   }
 
   private def moveDirection = if (currentTurn == White) 1 else -1
+
+  private def oppositeColor(color: PieceColor) = if (color == White) Black else White
+
+  private def possibleCaptureMoves(piece: Piece): List[CaptureMove] = {
+    def candidate(files: Int) = new Position(rank = piece.position.rank + moveDirection, file = piece.position.file + files)
+    List(-1, 1).map(files => new CaptureMove(piece = piece, position = candidate(files))).filter(c => pieceExistsAtPosition(c.position, Some(oppositeColor(piece.color))))
+  }
 
 }

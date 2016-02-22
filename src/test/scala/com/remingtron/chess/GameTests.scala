@@ -130,8 +130,38 @@ class GameTests extends path.FunSpec with Matchers {
         }
       }
 
+      describe("when board has a white pawn on a2 and a black pawn on b3") {
+        val whitePawn = new Piece(White, Pawn, "a2")
+        val blackPawn = new Piece(Black, Pawn, "b3")
+
+        it("has pawn to b3 capture as an available move on white's turn") {
+          val game = new Game(pieces = List(whitePawn, blackPawn), currentTurn = White)
+          game.availableMoves should contain (new CaptureMove(piece = whitePawn, position = "b3"))
+        }
+      }
+
+      describe("when board has a white pawn on b2 and a black pawn on a3") {
+        val whitePawn = new Piece(White, Pawn, "b2")
+        val blackPawn = new Piece(Black, Pawn, "a3")
+
+        it("has pawn to a3 capture as an available move on white's turn") {
+          val game = new Game(pieces = List(whitePawn, blackPawn), currentTurn = White)
+          game.availableMoves should contain (new CaptureMove(piece = whitePawn, position = "a3"))
+        }
+      }
+
+      describe("when board has a white pawn on b2 and a white pawn on a3") {
+        val whitePawn = new Piece(White, Pawn, "b2")
+        val otherWhitePawn = new Piece(White, Pawn, "a3")
+
+        it("has no available moves on white's turn") {
+          val game = new Game(pieces = List(whitePawn, otherWhitePawn), currentTurn = White)
+          game.availableMoves shouldNot contain (new CaptureMove(piece = whitePawn, position = "a3"))
+        }
+      }
+
       def moveList(piece: Piece, positions: List[String]): List[Move] = {
-        positions.map(position => new Move(piece = piece, position = position))
+        positions.map(position => new NonCaptureMove(piece = piece, position = position))
       }
     }
 
