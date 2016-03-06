@@ -30,6 +30,11 @@ class Game(private val pieces: List[Piece], val currentTurn: PieceColor = White)
     possibleNonCaptureMoves.filterNot(move => movingOffBoard(move.position) || pieceExistsAlongPath(move.piece.position, move.position))
   }
 
+  private def possibleCaptureMoves(piece: Piece): List[CaptureMove] = {
+    def candidate(files: Int) = new Position(rank = piece.position.rank + moveDirection, file = piece.position.file + files)
+    List(-1, 1).map(files => new CaptureMove(piece = piece, position = candidate(files))).filter(c => pieceExistsAtPosition(c.position, Some(oppositeColor(piece.color))))
+  }
+
   private def pieceExistsAlongPath(startingPosition: Position, endingPosition: Position): Boolean = {
     def convertToDirection(numberOfSpaces: Int): Int = {
       if (numberOfSpaces == 0) 0 else numberOfSpaces / abs(numberOfSpaces)
@@ -53,10 +58,5 @@ class Game(private val pieces: List[Piece], val currentTurn: PieceColor = White)
   private def moveDirection = if (currentTurn == White) 1 else -1
 
   private def oppositeColor(color: PieceColor) = if (color == White) Black else White
-
-  private def possibleCaptureMoves(piece: Piece): List[CaptureMove] = {
-    def candidate(files: Int) = new Position(rank = piece.position.rank + moveDirection, file = piece.position.file + files)
-    List(-1, 1).map(files => new CaptureMove(piece = piece, position = candidate(files))).filter(c => pieceExistsAtPosition(c.position, Some(oppositeColor(piece.color))))
-  }
 
 }
