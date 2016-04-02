@@ -16,4 +16,4 @@ include 'api'
 include 'services:webservice'
 */
 
-rootProject.name = 'chess_scala'
+rootProject.name = 'chess-scala'
